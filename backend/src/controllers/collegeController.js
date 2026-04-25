@@ -1,4 +1,4 @@
-import College from "../models/College.js";
+import College from "../models/college.js";
 
 
 // @desc   Add new college

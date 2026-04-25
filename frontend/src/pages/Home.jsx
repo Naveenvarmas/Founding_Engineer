@@ -9,10 +9,19 @@ const Home = () => {
   const [colleges, setColleges] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Input states
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
   const [rating, setRating] = useState("");
   const [maxFees, setMaxFees] = useState("");
+
+  // Applied filters
+  const [filters, setFilters] = useState({
+    search: "",
+    location: "",
+    rating: "",
+    maxFees: "",
+  });
 
   const selectedColleges = useCollegeStore(
     (state) => state.selectedColleges
@@ -33,35 +42,64 @@ const Home = () => {
     loadColleges();
   }, []);
 
+  const handleApplyFilters = () => {
+    setFilters({
+      search,
+      location,
+      rating,
+      maxFees,
+    });
+  };
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setLocation("");
+    setRating("");
+    setMaxFees("");
+
+    setFilters({
+      search: "",
+      location: "",
+      rating: "",
+      maxFees: "",
+    });
+  };
+
   const filteredColleges = useMemo(() => {
     let result = [...colleges];
 
-    if (search) {
+    if (filters.search) {
       result = result.filter((college) =>
-        college.name.toLowerCase().includes(search.toLowerCase())
+        college.name
+          .toLowerCase()
+          .includes(filters.search.toLowerCase())
       );
     }
 
-    if (location) {
+    if (filters.location) {
       result = result.filter((college) =>
-        college.location.toLowerCase().includes(location.toLowerCase())
+        college.location
+          .toLowerCase()
+          .includes(filters.location.toLowerCase())
       );
     }
 
-    if (rating) {
+    if (filters.rating) {
       result = result.filter(
-        (college) => Number(college.rating) >= Number(rating)
+        (college) =>
+          Number(college.rating) >= Number(filters.rating)
       );
     }
 
-    if (maxFees) {
+    if (filters.maxFees) {
       result = result.filter(
-        (college) => Number(college.fees) <= Number(maxFees)
+        (college) =>
+          Number(college.fees) <= Number(filters.maxFees)
       );
     }
 
     return result;
-  }, [colleges, search, location, rating, maxFees]);
+  }, [colleges, filters]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-blue-50">
@@ -71,6 +109,7 @@ const Home = () => {
         <h1 className="text-4xl font-bold text-slate-800">
           Find & Compare Top Colleges
         </h1>
+
         <p className="text-slate-500 mt-3">
           Make smarter admission decisions with side-by-side comparison.
         </p>
@@ -79,7 +118,7 @@ const Home = () => {
       <div className="max-w-7xl mx-auto px-4 py-8">
 
         {/* Filters */}
-        <div className="grid md:grid-cols-4 gap-4 mb-8">
+        <div className="grid md:grid-cols-4 gap-4 mb-4">
           <input
             type="text"
             placeholder="Search by college name"
@@ -118,6 +157,23 @@ const Home = () => {
             <option value="400000">₹4L</option>
             <option value="500000">₹5L</option>
           </select>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex gap-3 mb-8">
+          <button
+            onClick={handleApplyFilters}
+            className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
+          >
+            Apply Filters
+          </button>
+
+          <button
+            onClick={handleResetFilters}
+            className="bg-slate-200 px-6 py-3 rounded-xl hover:bg-slate-300 transition"
+          >
+            Reset
+          </button>
         </div>
 
         {selectedColleges.length >= 2 && <CompareTable />}
